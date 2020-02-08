@@ -23,7 +23,10 @@ func NewTaskManager(opts ...OptionHandleFunc) *TaskManager {
 	for _, item := range opts {
 		item(opt)
 	}
+	return newTaskManager(opt)
+}
 
+func newTaskManager(opt *Options) *TaskManager {
 	return &TaskManager{&sync.Map{}, &sync.WaitGroup{}, context.Background(), opt}
 }
 
@@ -72,14 +75,19 @@ func (job *TaskManager) Stop(keys ...string) {
 	if len(keys) > 0 {
 		if r, ok := job.store.Load(keys[0]); ok {
 			var so = r.(*TaskObject)
-			so.stop()
-			job.opt.logger.Infof("停止任务:%s - %s", so.taskId, so.title)
+			if so.IsRunning(){
+				so.stop()
+				job.opt.logger.Infof("停止任务:%s - %s", so.taskId, so.title)
+			}
 		}
 	} else {
 		job.store.Range(func(key, value interface{}) bool {
 			var so = value.(*TaskObject)
 			so.stop()
-			job.opt.logger.Infof("停止任务:%s - %s", so.taskId, so.title)
+			if so.IsRunning(){
+				so.stop()
+				job.opt.logger.Infof("停止任务:%s - %s", so.taskId, so.title)
+			}
 			return true
 		})
 	}
@@ -91,9 +99,9 @@ func (job *TaskManager) Remove(keys ...string) {
 		job.store.Delete(keys[0])
 		job.opt.logger.Infof("删除任务:%s", keys[0])
 	} else {
-		job.Stop()
-		job = NewTaskManager()
 		job.opt.logger.Infof("删除所有任务")
+		job.Stop()
+		*job = *newTaskManager(job.opt)
 	}
 }
 

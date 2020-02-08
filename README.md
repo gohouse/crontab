@@ -4,7 +4,7 @@ golang实现的简单便捷的计划任务管理系统, 自带 web 界面,方便
 支持 秒,分,时,日,月,周  
 
 ## 管理界面
-![](example/demo.jpg)
+![](example/demo.jpeg)
 
 ## install
 - go.mod
@@ -118,7 +118,9 @@ func teststrs(args ...interface{}) {
 ## restful api  
 `GET /start`  启动所有任务  
 `GET /start/{id}`  启动一个任务  
+`GET /stop`  停止所有任务  
 `GET /stop/{id}`  停止一个任务  
+`GET /remove`  删除所有任务  
 `GET /remove/{id}`  删除一个任务  
 `GET /tasklist`  任务列表  
 `GET /log?limit=20` 任务日志列表,limit为一次取最新多少条  

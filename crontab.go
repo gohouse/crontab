@@ -2,6 +2,7 @@ package crontab
 
 import (
 	"context"
+	"sync/atomic"
 	"time"
 )
 
@@ -34,6 +35,7 @@ type CronTab struct {
 	runOnceFirst bool
 	running      bool
 	opt          *Options
+	runTimes int64
 }
 
 func NewCronTab(cron CronType, opts ...OptionHandleFunc) *CronTab {
@@ -113,11 +115,16 @@ func (ct *CronTab) IsRunning() bool {
 	return ct.running
 }
 
+func (ct *CronTab) RunTimes() int64 {
+	return ct.runTimes
+}
+
 func (ct *CronTab) Run(h HandleFunc, args ...interface{}) {
 	ct.running = true
 	if ct.runOnceFirst {
 		go h(args...)
-		ct.opt.logger.Infof("执行任务:%v", args)
+		atomic.AddInt64(&ct.runTimes, 1)
+		ct.opt.logger.Infof("第%v次执行任务:%v", ct.runTimes, args)
 	}
 	for {
 		now := time.Now()
@@ -132,7 +139,8 @@ func (ct *CronTab) Run(h HandleFunc, args ...interface{}) {
 		case <-t.C:
 			//以下为定时执行的操作
 			go h(args...)
-			ct.opt.logger.Infof("执行任务:%v", args)
+			atomic.AddInt64(&ct.runTimes, 1)
+			ct.opt.logger.Infof("第%v次执行任务:%v", ct.runTimes,args)
 		}
 	}
 }

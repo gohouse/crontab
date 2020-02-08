@@ -21,20 +21,20 @@ func Run(ctm *crontab.TaskManager, port string) error {
 }
 
 func routeInit(route *gin.Engine) {
+	route.LoadHTMLGlob("client/client_web/*")
 	route.GET("/", index)
 	route.GET("/tasklist", taskList)
 	route.GET("/new/:step", refresh)
-	route.GET("/stop/:name", stop)
-	route.GET("/start", startAll)
-	route.GET("/start/:name", start)
-	route.GET("/remove/:name", remove)
+	route.GET("/stop", stop)
+	route.GET("/stop/:pkid", stop)
+	route.GET("/start", start)
+	route.GET("/start/:pkid", start)
+	route.GET("/remove", remove)
+	route.GET("/remove/:pkid", remove)
 	route.GET("/log", logInfo)
 }
 
 func index(c *gin.Context) {
-	//c.Header("Content-Type", "text/html; charset=utf-8")
-	//c.String(http.StatusOK, notice)
-
 	//c.HTML(http.StatusOK, "index.html", nil)
 
 	c.Header("Content-Type", "text/html; charset=utf-8")
@@ -42,24 +42,31 @@ func index(c *gin.Context) {
 }
 
 func start(c *gin.Context) {
-	var name = c.Param("name")
-	tm.Start(name)
-	c.String(http.StatusOK, "启动:"+name)
-}
-
-func startAll(c *gin.Context) {
-	tm.Start()
-	c.String(http.StatusOK, "启动所有任务")
+	var pkid = c.Param("pkid")
+	if pkid=="" {
+		tm.Start()
+	} else {
+		tm.Start(pkid)
+	}
+	c.String(http.StatusOK, "启动:"+pkid)
 }
 func stop(c *gin.Context) {
-	var name = c.Param("name")
-	tm.Stop(name)
-	c.String(http.StatusOK, "停止:"+name)
+	var pkid = c.Param("pkid")
+	if pkid=="" {
+		tm.Stop()
+	} else {
+		tm.Stop(pkid)
+	}
+	c.String(http.StatusOK, "停止:"+pkid)
 }
 func remove(c *gin.Context) {
-	var name = c.Param("name")
-	tm.Remove(name)
-	c.String(http.StatusOK, "移出:"+name)
+	var pkid = c.Param("pkid")
+	if pkid=="" {
+		tm.Remove()
+	} else {
+		tm.Remove(pkid)
+	}
+	c.String(http.StatusOK, "删除:"+pkid)
 }
 func taskList(c *gin.Context) {
 	var result = []map[string]interface{}{}

@@ -18,13 +18,16 @@
     <div class="row">
         <div class="col-sm-6">
 
-            <center><h2>任务列表</h2></center>
+            <center><h3>任务列表</h3></center>
             <div class="input-group ">
                 3s周期的测试任务:
                 <input id="second" type="number" value="3">
                 <div class="input-group-append">
                     <button class="btn btn-sm btn-success" type="button" onclick="create()">创建</button>
                 </div>
+                &nbsp;<button class="btn btn-primary btn-sm" onclick="oper('start')">启动所有</button>
+                &nbsp;<button class="btn btn-warning btn-sm" onclick="oper('stop')">停止所有</button>
+                &nbsp;<button class="btn btn-danger btn-sm" onclick="if (confirm('确定删除所有任务?')){oper('remove')}">删除所有</button>
             </div>
             <table class="table table-dark table-striped">
                 <thead>
@@ -51,20 +54,29 @@
                 </tbody>
             </table>
 
-            <h2>api说明</h2>
 
-            <p>启动所有任务 api: /start</p>
-            <p>启动一个任务 api: /start/{id}</p>
-            <p>停止一个任务 api: /stop/{id}</p>
-            <p>移除一个任务 api: /remove/{id}</p>
-            <p>任务列表 api: /taskList</p>
-            <p>任务日志 api: /log?limit=20</p>
+
+            <p>
+                <button class="btn btn-info" data-toggle="collapse" data-target="#apiNote">> restful api说明,点击展开</button>
+                由于不涉及数据传输,故都采用了 GET 请求</p>
+            <div id="apiNote" class="collapse">
+                <code>
+                    <p>启动所有任务 api: /start</p>
+                    <p>启动一个任务 api: /start/{id}</p>
+                    <p>停止所有任务 api: /stop</p>
+                    <p>停止一个任务 api: /stop/{id}</p>
+                    <p>移除所有任务 api: /remove</p>
+                    <p>移除一个任务 api: /remove/{id}</p>
+                    <p>任务列表 api: /taskList</p>
+                    <p>任务日志 api: /log?limit=20</p>
+                </code>
+            </div>
         </div>
 
 
         <div class="col-sm-6">
 
-            <center><h2>运行日志</h2></center>
+            <center><h3>运行日志</h3></center>
             <div class="input-group ">
                 刷新日志(limit=20):
                 <input id="refresh" type="number" value="20">
@@ -154,7 +166,15 @@
     }
 
     function oper(api, id) {
-        $.get("/" + api + "/" + id, {}, function () {
+        // console.log(id);
+        // console.log(id=="undefined" || id==null);
+        // console.log(id==null);
+        // return
+        var url = "/"+api
+        if (id!="undefined" && id!=null && id!="" && id!=0) {
+            url = "/" + api + "/" + id
+        }
+        $.get(url, {}, function () {
             taskList()
         })
     }
