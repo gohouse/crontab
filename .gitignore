@@ -15,4 +15,4 @@
 # vendor/
 *.log
 *.sum
-.DS_Store
+*.DS_Store

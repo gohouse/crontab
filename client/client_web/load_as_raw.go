@@ -33,7 +33,7 @@ func LoadTemplate() string {
             <table class="table table-dark table-striped">
                 <thead>
                 <tr>
-                    <th>任务id</th>
+                    <th>id</th>
                     <th>任务名字</th>
                     <th>运行状态</th>
                     <th>操作</th>

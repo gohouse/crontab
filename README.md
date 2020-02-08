@@ -115,14 +115,14 @@ func teststrs(args ...interface{}) {
 }
 ```
 
-### restful api 
-参考 `cmd/restfulapi/api.go`  
+## restful api  
 `GET /start/{id}`  
 `GET /stop/{id}`  
 `GET /remove/{id}`  
 `GET /tasklist`  
 
-### api参考
+## 各种用例参考
+各个缺省值为: 秒(0),分(0),时(0),日(1),周(日),月(无)  
 ```shell script
 # 每3s执行一次
 crontab.NewCronTab(crontab.CT_Second).SetSecond(3)
@@ -141,3 +141,4 @@ crontab.NewCronTab(crontab.CT_Week).SetWeek(time.Sunday).SetMinute(5)
 ```shell script
 crontab.NewCronTab(crontab.CT_Second).SetSecond(3).RunOnceFirst(false)
 ```
+> 周期任务本身不能为0,如: 按秒执行的周期不能为0s,即不能有0s的周期任务
