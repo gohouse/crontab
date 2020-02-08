@@ -1,6 +1,7 @@
 # crontab
-a simple and powerful crontab write in golang with web page management  
+a simple and powerful crontab written in golang with web page management  
 golang实现的简单便捷的计划任务管理系统, 自带 web 界面,方便的管理多个任务  
+支持 秒,分,时,日,月,周  
 
 ## 管理界面
 ![](example/demo.jpg)
@@ -120,3 +121,23 @@ func teststrs(args ...interface{}) {
 `GET /stop/{id}`  
 `GET /remove/{id}`  
 `GET /tasklist`  
+
+### api参考
+```shell script
+# 每3s执行一次
+crontab.NewCronTab(crontab.CT_Second).SetSecond(3)
+# 每分钟的第5s执行一次
+crontab.NewCronTab(crontab.CT_Minute).SetMinute(1).SetSecond(5)
+# 每2小时的第0分5s执行一次,缺省分钟则默认为0,下同
+crontab.NewCronTab(crontab.CT_Hour).SetHour(2).SetSecond(5)
+# 每3天的0点0分5s执行一次
+crontab.NewCronTab(crontab.CT_Day).SetDay(3).SetSecond(5)
+# 每月1号的03点05分0s执行一次,缺省日期为1号
+crontab.NewCronTab(crontab.CT_Month).SetMonth(1).SetHour(3).SetMinute(5)
+# 每周周日的0点5分0s执行一次
+crontab.NewCronTab(crontab.CT_Week).SetWeek(time.Sunday).SetMinute(5)
+```
+所有计划任务再运行时,都会优先执行一次,如果不想先执行一次,则可以调用`RunOnceFirst(false)`即可,如
+```shell script
+crontab.NewCronTab(crontab.CT_Second).SetSecond(3).RunOnceFirst(false)
+```
