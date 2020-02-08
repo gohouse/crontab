@@ -25,6 +25,7 @@ func routeInit(route *gin.Engine) {
 	route.GET("/tasklist", taskList)
 	route.GET("/new/:step", refresh)
 	route.GET("/stop/:name", stop)
+	route.GET("/start", startAll)
 	route.GET("/start/:name", start)
 	route.GET("/remove/:name", remove)
 	route.GET("/log", logInfo)
@@ -44,6 +45,11 @@ func start(c *gin.Context) {
 	var name = c.Param("name")
 	tm.Start(name)
 	c.String(http.StatusOK, "启动:"+name)
+}
+
+func startAll(c *gin.Context) {
+	tm.Start()
+	c.String(http.StatusOK, "启动所有任务")
 }
 func stop(c *gin.Context) {
 	var name = c.Param("name")

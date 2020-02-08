@@ -116,10 +116,12 @@ func teststrs(args ...interface{}) {
 ```
 
 ## restful api  
-`GET /start/{id}`  
-`GET /stop/{id}`  
-`GET /remove/{id}`  
-`GET /tasklist`  
+`GET /start`  启动所有任务  
+`GET /start/{id}`  启动一个任务  
+`GET /stop/{id}`  停止一个任务  
+`GET /remove/{id}`  删除一个任务  
+`GET /tasklist`  任务列表  
+`GET /log?limit=20` 任务日志列表,limit为一次取最新多少条  
 
 ## 各种用例参考
 各个缺省值为: 秒(0),分(0),时(0),日(1),周(日),月(无)  
@@ -132,7 +134,7 @@ crontab.NewCronTab(crontab.CT_Minute).SetMinute(1).SetSecond(5)
 crontab.NewCronTab(crontab.CT_Hour).SetHour(2).SetSecond(5)
 # 每3天的0点0分5s执行一次
 crontab.NewCronTab(crontab.CT_Day).SetDay(3).SetSecond(5)
-# 每月1号的03点05分0s执行一次,缺省日期为1号
+# 每月1号的03点05分0s执行一次,缺省日期为1号,可通过 SetDay(3) 改变日期为3号等
 crontab.NewCronTab(crontab.CT_Month).SetMonth(1).SetHour(3).SetMinute(5)
 # 每周周日的0点5分0s执行一次
 crontab.NewCronTab(crontab.CT_Week).SetWeek(time.Sunday).SetMinute(5)

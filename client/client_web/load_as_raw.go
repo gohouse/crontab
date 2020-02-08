@@ -57,11 +57,12 @@ func LoadTemplate() string {
 
             <h2>api说明</h2>
 
-            <p>停止任务 api: /stop/{id}</p>
-            <p>启动任务 api: /start/{id}</p>
-            <p>移除任务 api: /remove/{id}</p>
-            <p>任务日志 api: /log?limit=20</p>
+            <p>启动所有任务 api: /start</p>
+            <p>启动一个任务 api: /start/{id}</p>
+            <p>停止一个任务 api: /stop/{id}</p>
+            <p>移除一个任务 api: /remove/{id}</p>
             <p>任务列表 api: /taskList</p>
+            <p>任务日志 api: /log?limit=20</p>
         </div>
 
 
