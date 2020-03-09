@@ -2,8 +2,8 @@ package fileLog
 
 import (
 	"fmt"
-	"github.com/gohouse/date"
-	"github.com/gohouse/file"
+	"github.com/gohouse/golib/date"
+	"github.com/gohouse/golib/file"
 	"os"
 )
 

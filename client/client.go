@@ -4,24 +4,29 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/crontab"
 	"github.com/gohouse/crontab/client/client_web"
-	"github.com/gohouse/t"
+	"github.com/gohouse/golib/t"
+	"log"
 	"net/http"
 	"strings"
 )
 
 var tm *crontab.TaskManager
 var htmlRaw = client_web.LoadTemplate()
-
-func Run(ctm *crontab.TaskManager, port string) error {
+var title = "golang计划任务"
+func Run(ctm *crontab.TaskManager, port string,titles ...string) error {
+	if len(titles)>0{
+		title = titles[0]
+	}
 	tm = ctm
 	// 启动web服务
 	route := gin.Default()
 	routeInit(route)
+	log.Println("visit: http://localhost"+port)
 	return route.Run(port)
 }
 
 func routeInit(route *gin.Engine) {
-	route.LoadHTMLGlob("client/client_web/*")
+	//route.LoadHTMLGlob("client/client_web/*")
 	route.GET("/", index)
 	route.GET("/tasklist", taskList)
 	route.GET("/new/:step", refresh)
@@ -38,7 +43,10 @@ func index(c *gin.Context) {
 	//c.HTML(http.StatusOK, "index.html", nil)
 
 	c.Header("Content-Type", "text/html; charset=utf-8")
-	c.String(200, htmlRaw)
+	//var title = struct {
+	//	Title string
+	//}{title}
+	c.String(200, htmlRaw, title)
 }
 
 func start(c *gin.Context) {

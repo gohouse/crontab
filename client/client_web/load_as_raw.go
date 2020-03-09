@@ -18,7 +18,7 @@ func LoadTemplate() string {
 <body>
 
 <div class="container-fluid">
-    <center><h2>golang计划任务</h2></center>
+    <center><h2>%s</h2></center>
     <div class="row">
         <div class="col-sm-6">
 

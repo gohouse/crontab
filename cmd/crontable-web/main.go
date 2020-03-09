@@ -17,7 +17,8 @@ func main() {
 	tm := crontab.NewTaskManager(crontab.Logger(fileLog.NewFileLog(logfile)))
 
 	// 加入任务列表
-	TaskInit(tm)
+	//TaskInit(tm)
+	tm.AddGroup(TaskInit)
 
 	// 开启 restful api 服务
 	log.Fatal(client.Run(tm, port))

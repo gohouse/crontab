@@ -91,7 +91,7 @@ package main
 import (
 	"fmt"
 	"github.com/gohouse/crontab"
-	"github.com/gohouse/date"
+	"github.com/gohouse/golib/date"
 	"log"
 	"time"
 )

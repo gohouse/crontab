@@ -2,7 +2,7 @@ package crontab
 
 import (
 	"context"
-	"github.com/gohouse/t"
+	"github.com/gohouse/golib/t"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -11,6 +11,7 @@ import (
 var incId int64
 
 func GetId() int64 { return atomic.AddInt64(&incId, 1) }
+
 type TaskManager struct {
 	store *sync.Map
 	wg    *sync.WaitGroup
@@ -30,9 +31,9 @@ func newTaskManager(opt *Options) *TaskManager {
 	return &TaskManager{&sync.Map{}, &sync.WaitGroup{}, context.Background(), opt}
 }
 
-func (job *TaskManager) Add(title string, cron *CronTab, callback HandleFunc, args ...interface{}) *TaskManager {
+func (job *TaskManager) Add(title string, cron *CronTab, callback HandleFunc, args ...interface{}) string {
 	var taskId = t.New(GetId()).String()
-	args = append(args,taskId,"-",title)
+	args = append(args, taskId, "-", title)
 	cron.opt = job.opt
 	var so = TaskObject{
 		cron:     cron,
@@ -43,7 +44,11 @@ func (job *TaskManager) Add(title string, cron *CronTab, callback HandleFunc, ar
 	}
 	job.store.Store(taskId, &so)
 	job.opt.logger.Infof("添加任务:%s - %s", taskId, title)
-	return job
+	return taskId
+}
+
+func (job *TaskManager) AddGroup(tl func(*TaskManager)) {
+	tl(job)
 }
 
 func (job *TaskManager) Start(keys ...string) {
@@ -75,7 +80,7 @@ func (job *TaskManager) Stop(keys ...string) {
 	if len(keys) > 0 {
 		if r, ok := job.store.Load(keys[0]); ok {
 			var so = r.(*TaskObject)
-			if so.IsRunning(){
+			if so.IsRunning() {
 				so.stop()
 				job.opt.logger.Infof("停止任务:%s - %s", so.taskId, so.title)
 			}
@@ -84,7 +89,7 @@ func (job *TaskManager) Stop(keys ...string) {
 		job.store.Range(func(key, value interface{}) bool {
 			var so = value.(*TaskObject)
 			so.stop()
-			if so.IsRunning(){
+			if so.IsRunning() {
 				so.stop()
 				job.opt.logger.Infof("停止任务:%s - %s", so.taskId, so.title)
 			}

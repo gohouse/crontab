@@ -3,7 +3,7 @@ package gobPersist
 import (
 	"encoding/gob"
 	"errors"
-	"github.com/gohouse/file"
+	"github.com/gohouse/golib/file"
 	"os"
 )
 var FileNotExists = errors.New("file not exists.")
