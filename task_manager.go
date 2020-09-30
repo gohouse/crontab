@@ -3,7 +3,7 @@ package crontab
 import (
 	"context"
 	"github.com/gohouse/golib/t"
-	"strings"
+	"github.com/sirupsen/logrus"
 	"sync"
 	"sync/atomic"
 )
@@ -17,6 +17,7 @@ type TaskManager struct {
 	wg    *sync.WaitGroup
 	ctx   context.Context
 	opt   *Options
+	done  chan struct{}
 }
 
 func NewTaskManager(opts ...OptionHandleFunc) *TaskManager {
@@ -24,11 +25,14 @@ func NewTaskManager(opts ...OptionHandleFunc) *TaskManager {
 	for _, item := range opts {
 		item(opt)
 	}
+	if opt.logger == nil {
+		opt.logger = logrus.New()
+	}
 	return newTaskManager(opt)
 }
 
 func newTaskManager(opt *Options) *TaskManager {
-	return &TaskManager{&sync.Map{}, &sync.WaitGroup{}, context.Background(), opt}
+	return &TaskManager{&sync.Map{}, &sync.WaitGroup{}, context.Background(), opt, make(chan struct{})}
 }
 
 func (job *TaskManager) Add(title string, cron *CronTab, callback HandleFunc, args ...interface{}) string {
@@ -74,6 +78,7 @@ func (job *TaskManager) Start(keys ...string) {
 
 func (job *TaskManager) Wait() {
 	job.wg.Wait()
+	select {}
 }
 
 func (job *TaskManager) Stop(keys ...string) {
@@ -96,6 +101,15 @@ func (job *TaskManager) Stop(keys ...string) {
 			return true
 		})
 	}
+	//// 判断是否还有任务
+	//var jobs int
+	//job.store.Range(func(key, value interface{}) bool {
+	//	jobs++
+	//	return true
+	//})
+	//if jobs == 0 {
+	//	job.done <- struct{}{}
+	//}
 }
 
 func (job *TaskManager) Remove(keys ...string) {
@@ -112,8 +126,4 @@ func (job *TaskManager) Remove(keys ...string) {
 
 func (job *TaskManager) Range(f func(key, value interface{}) bool) {
 	job.store.Range(f)
-}
-
-func (job *TaskManager) LogInfo(readRows ...int64) string {
-	return strings.TrimSpace(job.opt.logger.Read(readRows...))
 }

@@ -10,12 +10,18 @@ import (
 
 func main() {
 	var job = crontab.NewTaskManager()
-	cron := crontab.NewCronTab(crontab.CT_Second).SetSecond(1)
-	cron2 := crontab.NewCronTab(crontab.CT_Second).SetSecond(1)
-	job.Add("xxx", cron, teststr).Add("xxx222", cron2, teststrs)
+
+	cron := crontab.NewCronTab(crontab.CT_Second).SetSecond(3)
+	cron2 := crontab.NewCronTab(crontab.CT_Second).SetSecond(3)
+	job.Add("xxx", cron, teststr)
+	job.Add("xxx222", cron2, teststrs)
 
 	log.Println("start...")
 	job.Start()
+	//go func() {
+	//	time.Sleep(10*time.Second)
+	//	job.Stop()
+	//}()
 	job.Wait()
 }
 

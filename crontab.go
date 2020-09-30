@@ -2,6 +2,7 @@ package crontab
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
 	"sync/atomic"
 	"time"
 )
@@ -29,13 +30,13 @@ type CronValue struct {
 type HandleFunc func(args ...interface{})
 
 type CronTab struct {
-	context.Context
+	ctx context.Context
 	CronType
 	cronv        CronValue
 	runOnceFirst bool
 	running      bool
 	opt          *Options
-	runTimes int64
+	runTimes     int64
 }
 
 func NewCronTab(cron CronType, opts ...OptionHandleFunc) *CronTab {
@@ -44,7 +45,7 @@ func NewCronTab(cron CronType, opts ...OptionHandleFunc) *CronTab {
 		item(opt)
 	}
 	return &CronTab{
-		Context:  context.TODO(),
+		ctx:      context.TODO(),
 		CronType: cron,
 		cronv: CronValue{
 			Month: 1,
@@ -120,6 +121,9 @@ func (ct *CronTab) RunTimes() int64 {
 }
 
 func (ct *CronTab) Run(h HandleFunc, args ...interface{}) {
+	if ct.opt.logger == nil {
+		ct.opt.logger = logrus.New()
+	}
 	ct.running = true
 	if ct.runOnceFirst {
 		go h(args...)
@@ -132,7 +136,7 @@ func (ct *CronTab) Run(h HandleFunc, args ...interface{}) {
 		t := time.NewTimer(next.Sub(now))
 		defer t.Stop()
 		select {
-		case <-ct.Done():
+		case <-ct.ctx.Done():
 			ct.running = false
 			//log.Println("done ...")
 			return
@@ -140,7 +144,7 @@ func (ct *CronTab) Run(h HandleFunc, args ...interface{}) {
 			//以下为定时执行的操作
 			go h(args...)
 			atomic.AddInt64(&ct.runTimes, 1)
-			ct.opt.logger.Infof("第%v次执行任务:%v", ct.runTimes,args)
+			ct.opt.logger.Infof("第%v次执行任务:%v", ct.runTimes, args)
 		}
 	}
 }

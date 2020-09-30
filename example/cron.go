@@ -8,7 +8,7 @@ import (
 
 func main() {
 	crontab.NewCronTab(crontab.CT_Second).
-		SetSecond(1).
+		SetSecond(3).
 		SetWeek(time.Sunday).
 		RunOnceFirst().
 		Run(func(args ...interface{}) {

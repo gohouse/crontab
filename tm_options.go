@@ -1,20 +1,18 @@
 package crontab
 
-import "github.com/gohouse/crontab/adapter"
+import (
+	"github.com/sirupsen/logrus"
+)
 
 type Options struct {
-	persist adapter.Persister
-	logger  adapter.Logger
+	logger  *logrus.Logger
 }
 type OptionHandleFunc func(options *Options)
 
-func Persist(ps adapter.Persister) OptionHandleFunc {
-	return func(options *Options) {
-		options.persist = ps
+func Logger(al *logrus.Logger) OptionHandleFunc {
+	if al == nil {
+		al = logrus.New()
 	}
-}
-
-func Logger(al adapter.Logger) OptionHandleFunc {
 	return func(options *Options) {
 		options.logger = al
 	}

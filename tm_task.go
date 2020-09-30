@@ -7,8 +7,8 @@ type TaskObject struct {
 	callback HandleFunc
 	args     []interface{}
 	cancel   context.CancelFunc
-	title string
-	taskId string
+	title    string
+	taskId   string
 }
 
 func (so *TaskObject) start() {
@@ -16,7 +16,7 @@ func (so *TaskObject) start() {
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	so.cron.Context = ctx
+	so.cron.ctx = ctx
 	so.cancel = cancel
 	so.cron.Run(so.callback, so.args...)
 }

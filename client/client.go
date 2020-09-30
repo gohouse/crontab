@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/crontab"
 	"github.com/gohouse/crontab/client/client_web"
+	"github.com/gohouse/golib/file"
 	"github.com/gohouse/golib/t"
 	"log"
 	"net/http"
@@ -13,7 +14,9 @@ import (
 var tm *crontab.TaskManager
 var htmlRaw = client_web.LoadTemplate()
 var title = "golang计划任务"
-func Run(ctm *crontab.TaskManager, port string,titles ...string) error {
+var logfile = "crontab.log"
+func Run(ctm *crontab.TaskManager, port string, logfile_ string,titles ...string) error {
+	logfile = logfile_
 	if len(titles)>0{
 		title = titles[0]
 	}
@@ -108,7 +111,9 @@ func logInfo(c *gin.Context) {
 	if r,ok:=c.GetQuery("limit");ok{
 		limit = t.New(r).Int64()
 	}
-	c.JSON(http.StatusOK, strings.Split(tm.LogInfo(limit),"\n"))
+	// 获取
+	f := file.Tail_f(logfile, limit)
+	c.JSON(http.StatusOK, strings.Split(strings.TrimSpace(f),"\n"))
 }
 
 func Test(args ...interface{})  {
