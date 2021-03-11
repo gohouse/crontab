@@ -8,6 +8,7 @@ import (
 	"github.com/gohouse/golib/t"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 )
 
@@ -80,23 +81,34 @@ func remove(c *gin.Context) {
 	c.String(http.StatusOK, "删除:"+pkid)
 }
 func taskList(c *gin.Context) {
-	var result = []map[string]interface{}{}
-	tm.Range(func(key, value interface{}) bool {
+	var result = make(resultListStructSort, 0)
+	_func := func(key, value interface{}) bool {
 		val := value.(*crontab.TaskObject)
 		var taskStatus = "已停止"
 		if val.IsRunning() {
 			taskStatus = "运行中"
 		}
 		result = append(result, map[string]interface{}{
-			"status":taskStatus,
-			"id":key,
-			"title":val.Title(),
+			"status": taskStatus,
+			"id":     key,
+			"title":  val.Title(),
 		})
 		return true
-	})
+	}
+	tm.Range(_func)
+	sort.Sort(sort.Reverse(result))
 	//c.Header("Content-Type", "text/html; charset=utf-8")
 	c.JSON(http.StatusOK, result)
 }
+
+//重写map排序规则
+type resultListStructSort []map[string]interface{}
+
+func (p resultListStructSort) Len() int { return len(p) }
+func (p resultListStructSort) Less(i, j int) bool {
+	return ToInt64(p[i]["id"]) > ToInt64(p[j]["id"])
+}
+func (p resultListStructSort) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
 
 func refresh(c *gin.Context) {
 	var step = c.Param("step")
